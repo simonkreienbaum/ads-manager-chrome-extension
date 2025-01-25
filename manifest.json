@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Meta Ads Manager Helper by Kitchn.io",
+  "version": "1.0",
+  "description": "Helps you save time with Meta Ads Manager. Generate preview links in bulk, turn off all creative enhancements, and more.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "webRequest",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://*.facebook.com/*",
+    "https://graph.facebook.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "logo16.png",
+      "48": "logo48.png",
+      "128": "logo128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.facebook.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["logger.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "options_page": "options.html",
+  "icons": {
+    "16": "logo16.png",
+    "48": "logo48.png",
+    "128": "logo128.png"
+  }
+}

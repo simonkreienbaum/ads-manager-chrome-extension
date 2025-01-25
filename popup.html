@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kitchn.io Ads Manager Helper</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      width: 500px;
+      padding: 25px;
+      font-family: 'Roboto', sans-serif;
+      background-color: rgb(240, 242, 255);
+      color: #333;
+    }
+    h1, h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #4a4a4a;
+    }
+    button {
+      background-color: #423ebd;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 8px 0;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s, opacity 0.3s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    button:hover:not(:disabled) {
+      background-color: #3632a8;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px 20px;
+      box-sizing: border-box;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      background-color: #f8f8f8;
+      font-size: 16px;
+      resize: none;
+    }
+    #tokenStatus {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #e7e7e7;
+      border-radius: 4px;
+    }
+    #log {
+      height: 100px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      color: #666;
+    }
+    #previewTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2px;
+    }
+    #previewTable th, #previewTable td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    #previewTable th {
+      background-color: #f2f2f2;
+    }
+    #copyToClipboard {
+      margin-top: 10px;
+    }
+    [data-tooltip]:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      opacity: 0;
+      transition: all 0.15s ease;
+      padding: 10px;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 2px 2px 1px silver;
+      width: 300px;
+      bottom: 100%;
+      left: 0;
+      background: #f8f8f8;
+      pointer-events: none;
+    }
+    [data-tooltip]:hover:before {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .info-icon {
+      font-size: 14px;
+      vertical-align: super;
+      cursor: help;
+      position: relative;
+    }
+    .info-icon[data-tooltip]:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.15s ease;
+      padding: 10px;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 2px 2px 1px silver;
+      width: 300px;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f8f8f8;
+      z-index: 1;
+      word-wrap: break-word;
+      white-space: normal;
+    }
+    .info-icon[data-tooltip]:hover:before {
+      opacity: 1;
+      visibility: visible;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #423ebd;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    .loading-message {
+      color: #423ebd;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Special handling for utility buttons that don't use the primary style */
+    #parseAdIds:disabled, #refreshPopup:disabled, #copyToClipboard:disabled {
+      color: #cccccc;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    #parseAdIds:hover:not(:disabled), #copyToClipboard:hover:not(:disabled) {
+      color: #3632a8;
+    }
+  </style>
+</head>
+<body>
+  <div style="display: flex; align-items: center; margin-bottom: 20px;">
+    <img src="logo128.png" alt="Kitchn.io Logo" style="width: 40px; height: 40px; margin-right: 10px;">
+    <h1>Kitchn.io Ads Manager Helper</h1>
+  </div>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+    <button id="parseAdIds" style="background: none; color: #423ebd; text-align: left; padding: 0; white-space: nowrap; position: relative;">Load selected Ad IDs <span class="info-icon" data-tooltip="Instead of manually copy/pasting each ad id, you can simply select ads in Ads Manager using the checkbox on the left of the Ads overview. Then, click this button to load all selected ids into the field below by parsing the current URL.">ⓘ</span></button>
+    <button id="refreshPopup" style="background: none; border: none; cursor: pointer; text-align: right; font-size: 16px; margin-right: 0px; padding-right: 0px">✖️</button>
+  </div>
+  <textarea id="adIds" placeholder="Enter Ad IDs (one per line)"></textarea>
+  <button id="submitAdIds">Turn off all Creative enhancements</button>
+  <button id="getAdPreviews">Get Ad Previews</button>
+  <div style="text-align: right; margin-bottom: 2px; margin-left: auto; margin-right: 0;">
+    <button id="copyToClipboard" style="background: none; color: #423ebd; text-align: left; padding: 0; display: none;">Copy table to clipboard</button>
+  </div>
+  <table id="previewTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>Ad ID</th>
+        <th>Ad Name</th>
+        <th>Preview Link</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <!-- Replace the log paragraph with this -->
+  <p id="logLabel" style="font-size: 16px;">Log</p>
+  <div id="log"></div>
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
