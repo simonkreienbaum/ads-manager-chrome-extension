@@ -110,12 +110,21 @@ async function getAdPreviews(adIds, onProgress) {
       if (onProgress) {
         onProgress(i + 1, adIds.length);
       }
-      log(`Fetching preview for ad ${adIds[i]}`);
+      const adId = adIds[i];
+      log(`Fetching preview for ad ${adId}`);
       try {
-        const preview = await facebookClient.fetchAdPreview(adIds[i]);
-        results.push(preview);
+        // First fetch the ad creative to get the Post ID
+        const creative = await facebookClient.fetchAdCreative(adId);
+        // Then fetch the preview
+        const preview = await facebookClient.fetchAdPreview(adId);
+        
+        results.push({
+          adId: adId,
+          effective_object_story_id: creative.effective_object_story_id,
+          previewUrl: preview.previewUrl
+        });
       } catch (error) {
-        log(`Error fetching preview for ad ${adIds[i]}: ${error.message}`);
+        log(`Error fetching preview for ad ${adId}: ${error.message}`);
         results.push(null);
       }
     }
@@ -125,6 +134,16 @@ async function getAdPreviews(adIds, onProgress) {
     log(`Error fetching ad previews: ${error.message}`);
     throw error;
   }
+}
+
+async function getAdCreatives(adIds) {
+  const fields = [
+    'id',
+    'effective_object_story_id',
+  ].join(',');
+
+  const response = await makeApiCall(`/ads_archive?fields=${fields}&ids=${adIds.join(',')}`);
+  return response;
 }
 
 export { turnOffAdvantageCreative, getAdPreviews };
