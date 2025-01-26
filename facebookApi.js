@@ -100,24 +100,17 @@ async function createAdCreativeWithoutAdvantage(adCreative) {
 }
 
 async function getAdPreviews(adIds, onProgress) {
-  log('Starting getAdPreviews process');
+  log('Starting batch getAdPreviews process');
   
   await ensureAccessToken();
   
   try {
     const results = [];
-    for (let i = 0; i < adIds.length; i++) {
-      if (onProgress) {
-        onProgress(i + 1, adIds.length);
-      }
-      log(`Fetching preview for ad ${adIds[i]}`);
-      try {
-        const preview = await facebookClient.fetchAdPreview(adIds[i]);
-        results.push(preview);
-      } catch (error) {
-        log(`Error fetching preview for ad ${adIds[i]}: ${error.message}`);
-        results.push(null);
-      }
+    const chunkSize = 50; // Adjust based on API limits
+    for (let i = 0; i < adIds.length; i += chunkSize) {
+      const chunk = adIds.slice(i, i + chunkSize);
+      const previews = await facebookClient.batchFetchAdPreviews(chunk, onProgress); // Use your batch fetching method
+      results.push(...previews);
     }
     log(`Successfully fetched previews for ${results.length} ads`);
     return results;

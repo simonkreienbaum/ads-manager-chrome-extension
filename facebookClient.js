@@ -128,7 +128,7 @@ class FacebookClient {
   }
 
   async fetchAdPreview(adId) {
-    const fields = 'id,name,preview_shareable_link';
+    const fields = 'id,name,preview_shareable_link,creative{effective_object_story_id}';
     try {
       log(`Fetching preview for ad ${adId}`);
       const data = await this.makeApiCall(`${adId}?fields=${fields}`);
@@ -146,7 +146,7 @@ class FacebookClient {
 
     for (let i = 0; i < adIds.length; i += chunkSize) {
       const chunk = adIds.slice(i, i + chunkSize);
-      const fields = 'id,name,preview_shareable_link';
+      const fields = 'id,name,preview_shareable_link,creative{effective_object_story_id}';
       const endpoint = `?ids=${chunk.join(',')}&fields=${fields}`;
 
       try {

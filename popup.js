@@ -178,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hide the previewTable and copyToClipboard button
     document.getElementById('previewTable').style.display = 'none';
     document.getElementById('copyToClipboard').style.display = 'none';
+    document.getElementById('createGSheet').style.display = 'none';
 
     const confirmDialog = document.createElement('div');
     confirmDialog.innerHTML = `
@@ -287,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoading(`Fetching ad previews... (0/${adIds.length})`);
     log(`Fetching previews for ${adIds.length} ad IDs`);
     
+    // Use the batch fetching method
     chrome.runtime.sendMessage({ 
       action: 'getAdPreviews', 
       adIds 
@@ -305,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Modify the displayAdPreviews function
+
   function displayAdPreviews(previews) {
     const table = document.getElementById('previewTable');
     const tbody = table.querySelector('tbody');
@@ -314,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     previews.forEach(preview => {
       if (preview && !preview.adId?.startsWith('__')) {  // Add null check
         const row = tbody.insertRow();
-        row.insertCell(0).textContent = preview.adId;
+        row.insertCell(0).textContent = preview.id;
         row.insertCell(1).textContent = preview.name || 'N/A';
         const linkCell = row.insertCell(2);
         const link = document.createElement('a');
@@ -322,12 +324,14 @@ document.addEventListener('DOMContentLoaded', () => {
         link.textContent = preview.preview_shareable_link;
         link.target = '_blank';
         linkCell.appendChild(link);
+        row.insertCell(3).textContent = preview.creative?.effective_object_story_id || 'N/A';
       }
     });
 
-    // Ensure table and copy button are visible
+    // Ensure table is visible and update button visibility
     table.style.display = 'table';
     document.getElementById('copyToClipboard').style.display = 'inline-block';
+    document.getElementById('createGSheet').style.display = 'inline-block';
   }
 
   document.getElementById('copyToClipboard').addEventListener('click', (event) => {
@@ -356,6 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.removeChild(tooltip);
       document.getElementById('copyToClipboard').style.display = 'none';
       document.getElementById('previewTable').style.display = 'none';
+      document.getElementById('createGSheet').style.display = 'none';
+      
     }, 1000);
   });
 
@@ -363,11 +369,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('adIds').value = '';
     document.getElementById('previewTable').style.display = 'none';
     document.getElementById('copyToClipboard').style.display = 'none';
+    document.getElementById('createGSheet').style.display = 'none';
     document.getElementById('log').innerHTML = '';
     log('Popup refreshed');
     updateButtonStates(); // Add this line to update button states after refresh
   });
   
+  document.getElementById('createGSheet').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'https://sheets.new' });
+  });
 });
 
 // Add this helper function at the bottom of popup.js

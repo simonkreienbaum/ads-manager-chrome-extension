@@ -191,9 +191,10 @@
   </div>
   <textarea id="adIds" placeholder="Enter Ad IDs (one per line)"></textarea>
   <button id="submitAdIds">Turn off all Creative enhancements</button>
-  <button id="getAdPreviews">Get Ad Previews</button>
+  <button id="getAdPreviews">Get Ad Previews & Post IDs</button>
   <div style="text-align: right; margin-bottom: 2px; margin-left: auto; margin-right: 0;">
     <button id="copyToClipboard" style="background: none; color: #423ebd; text-align: left; padding: 0; display: none;">Copy table to clipboard</button>
+    <button id="createGSheet" style="background: none; color: #423ebd; text-align: left; padding: 0; display: none;">Create a new GSheet</button>
   </div>
   <table id="previewTable" style="display: none;">
     <thead>
@@ -201,6 +202,7 @@
         <th>Ad ID</th>
         <th>Ad Name</th>
         <th>Preview Link</th>
+        <th>Post ID</th>
       </tr>
     </thead>
     <tbody></tbody>
